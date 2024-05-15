@@ -1,8 +1,25 @@
 const express = require('express')
 const Site = require('../Models/Site')
+const multer = require('multer');
+const fs=require('fs')
+const path = require('path');
+
 const router = express.Router()
 
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null,'Images')
+    },
+    filename: (req, file, cb) => {
+        cb(null,Date.now()+path.extname(file.originalname))
+    }
+})
+const upload=multer({storage:storage}).array('images', 10)
+
+
 router.get('/all', async (req, res) => {
+
+    console.log("redirected")
     try {
         const sites = await Site.find()
         res.json(sites)
@@ -14,37 +31,37 @@ router.get('/all', async (req, res) => {
 
 
 router.post('/add', async (req, res) => {
-    const data = {
-        siteName: req.body.siteName,
-        description: req.body.description,
-        location: {
-            address: req.body.location.address,
-            coordinates: req.body.location.coordinates
-        },
-        distance: req.body.distance,
-        openingHours: req.body.openingHours,
-        categories: req.body.categories,
-        facilitiesAvailable: req.body.facilitiesAvailable,
-        rating: req.body.rating,
-        images: req.body.images,
-        videos: req.body.videos,
-        transportations: req.body.transportations
+    
+            const data = {
+                siteName: req.body.siteName,
+                description: req.body.description,
+                location: req.body.location,
+                distance: req.body.distance,
+                openingHours: req.body.openingHours,
+                categories: req.body.categories,
+                facilitiesAvailable: req.body.facilitiesAvailable,
+                rating: req.body.rating,
+                videos: req.body.videos,
+                transportations: req.body.transportations
+        
+            }
+        
+            const site = new Site(data)
+        
+            try {
+                const result = await site.save()
+                res.json(result)
+        
+            } catch (err) {
+                res.json({ "error": err })
+            }
+        }
+    
+   
+   
+   
 
-    }
 
-    const site = new Site(data)
-
-    try {
-        const result = await site.save()
-        res.json(result)
-
-    } catch (err) {
-        const errmsg = err.errorResponse.errmsg
-        console.log(errmsg)
-        res.json({ "error": errmsg })
-    }
-
-}
 )
 
 router.post('/find', async (req, res) => {
@@ -79,31 +96,125 @@ router.post('/find', async (req, res) => {
 
 router.patch('/update/:siteName', async (req, res) => {
     
-    const existingDocument = await Site.findOne({ siteName: req.params.siteName })
-    if (!existingDocument) {
-        return res.json({ "error": 'Document not found' })
+    try {
+        const existingDocument = await Site.findOne({ siteName: req.params.siteName })
+   
+        Object.keys(req.body).forEach((key) => {
+            existingDocument[key] = req.body[key]
+        })
+
+        const updatedDocument = await existingDocument.save()
+
+        res.json(updatedDocument)
+    } catch (err) {
+        res.json({"error":err})
     }
 
+})
 
-    Object.keys(req.body).forEach((key) => {
-        existingDocument[key] = req.body[key]
+router.patch('/addImages/:siteName', (req, res) => {
+
+    upload(req, res, async (err) => {
+        if (err) {
+            console.error(err);
+            res.status(500).json({ error: 'Failed to upload images' });
+        } else {
+            //ensure there in no duplicated images, appending on the existing images, deleteing images ....
+
+            try {
+                imagepaths = req.files.map(file => `Images/${file.filename}`);
+                const site = await Site.findOne({ siteName: req.params.siteName })
+                site["images"].push(...imagepaths)
+                const updatedSite = await site.save()
+                res.json(updatedSite)
+            } catch (err) {
+                res.json({error:err})
+            }
+        }
     })
+    
 
-    const updatedDocument = await existingDocument.save()
+}
+    
+)
 
-    res.json(updatedDocument)
+router.get('/getImages/:siteName', async(req, res) => {
+    const {images:imagepaths} = await Site.findOne({ siteName: req.params.siteName }).select("images")
+    try {
+        
+        const images = [];
 
+        for (const fileName of imagepaths) {
+            const filePath = path.join(__dirname, '../', fileName);
+            const image = fs.readFileSync(filePath);
+            const base64Image = Buffer.from(image).toString('base64');
+            images.push(base64Image);
+        }
+
+        res.json({ images: images });
+        
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+})
+
+router.patch('/addVideos/:siteName', (req, res) => {
+
+
+    upload(req, res, async (err) => {
+        if (err) {
+            console.error(err);
+            res.status(500).json({ error: 'Failed to upload Videos' });
+        } else {
+
+            try {
+                videopaths = req.files.map(file => `Images/${file.filename}`);
+                const site = await Site.findOne({ siteName: req.params.siteName })
+                site["videos"].push(...videopaths)
+                const updatedSite = await site.save()
+                res.json(updatedSite)
+            } catch (err) {
+                res.json({error:err})
+            }
+        }
+    })
+    
+
+}
+    
+)
+
+router.get('/getVideos/:siteName', async(req, res) => {
+    const {videos:videopaths} = await Site.findOne({ siteName: req.params.siteName }).select("videos")
+    try {
+        
+        const videos = [];
+
+        for (const fileName of videopaths) {
+            const filePath = path.join(__dirname, '../', fileName);
+            const video = fs.readFileSync(filePath);
+            const base64Image = Buffer.from(video).toString('base64');
+            videos.push(base64Image);
+        }
+
+        res.json({ videos: videos });
+        
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 })
 
 
 router.delete('/delete/:siteName', async (req, res) => {
-    const result = await Site.deleteOne({ siteName: req.params.siteName })
+    try {
+        const result = await Site.deleteOne({ siteName: req.params.siteName })
 
-    if (result.deletedCount === 0)
-        res.status(404).json({ "error": "Not Found" })
-
-    res.json(({ "result": "Deleted Successfully" }))
-
+        res.json(({ "result": "Deleted Successfully" }))
+    } catch (err) {
+        res.json({"error":err})
+    }
 
 
 })

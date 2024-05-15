@@ -1,11 +1,7 @@
 const express = require('express')
 const router = express.Router()
-
-router.get('/all', (req, res) => {
-    console.log('return all admins info')
-})
+const baseURL = 'http://localhost:4000'
 
 
 
-
-module.exports=router
+module.exports = router

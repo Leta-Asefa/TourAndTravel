@@ -78,32 +78,32 @@ router.post('/find', async (req, res) => {
 
 router.patch('/update/:phoneNumber', async (req, res) => {
     
-    const existingDocument = await TourGuide.findOne({ phoneNumber: req.params.phoneNumber })
-    if (!existingDocument) {
-        return res.json({ "error": 'Document not found' })
+    try {
+        const existingDocument = await TourGuide.findOne({ phoneNumber: req.params.phoneNumber })
+    
+        Object.keys(req.body).forEach((key) => {
+            existingDocument[key] = req.body[key]
+        })
+
+        const updatedDocument = await existingDocument.save()
+
+        res.json(updatedDocument)
+    } catch (err) {
+        res.json({"error":err})
     }
-
-
-    Object.keys(req.body).forEach((key) => {
-        existingDocument[key] = req.body[key]
-    })
-
-    const updatedDocument = await existingDocument.save()
-
-    res.json(updatedDocument)
 
 })
 
 
 router.delete('/delete/:phoneNumber', async (req, res) => {
     
-    const result = await TourGuide.deleteOne({ phoneNumber: req.params.phoneNumber })
+    try {
+        const result = await TourGuide.deleteOne({ phoneNumber: req.params.phoneNumber })
 
-    if (result.deletedCount === 0)
-        res.json({ "error": "Not Found" })
-
-    res.json(({ "result": "Deleted Successfully" }))
-
+        res.json(({ "result": "Deleted Successfully" }))
+    } catch (err) {
+        res.json({'error':err})
+    }
 
 
 })

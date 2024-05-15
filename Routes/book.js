@@ -62,28 +62,42 @@ router.post('/find', async (req, res) => {
 })
 
 router.patch('/update/:id', async (req, res) => {
-    let existingDocument
+
     try {
-        existingDocument = await Book.findById(req.params.id)
-    } catch (error) {
-        return res.json({ "error": "Document not found" })
+       const existingDocument = await Book.findById(req.params.id)
+
+        Object.keys(req.body).forEach((key) => {
+            existingDocument[key] = req.body[key]
+        })
+
+        const updatedDocument = await existingDocument.save()
+
+        res.json(updatedDocument)
     }
-   
+    catch (err) {
+        return res.json({ "error": err })
+    }
 
 
-
-    Object.keys(req.body).forEach((key) => {
-        if (req.body[key] !== undefined) {
-            existingDocument[key] = req.body[key];
-        }
-    })
-
-    const updatedDocument = await existingDocument.save()
-
-    res.json(updatedDocument)
 
 })
 
+
+router.delete('/delete/:id', async (req, res) => {
+
+   
+    try {
+       const result = await Book.deleteOne({ _id: req.params.id })
+        res.json(({ "result": "Deleted Successfully" }))
+    }
+    catch (err) {
+        res.json({ "error": err })
+    }
+
+
+
+
+})
 
 
 

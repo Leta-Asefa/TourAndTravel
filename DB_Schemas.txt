@@ -1,0 +1,34 @@
+const express = require('express');
+const fs = require('fs');
+const path = require('path');
+
+const app = express();
+
+// Assume the URL of the image is retrieved from the database
+const imageUrl = '/uploads/image.jpg'; // Example URL
+
+app.get('/get-image', (req, res) => {
+    // Read the image file from the file system
+    const imagePath = path.join(__dirname, imageUrl);
+    fs.readFile(imagePath, (err, data) => {
+        if (err) {
+            // Handle file read error
+            console.error(err);
+            res.status(500).json({ error: 'Failed to read image file' });
+        } else {
+            // Convert the image data to base64 string
+            const base64Image = Buffer.from(data).toString('base64');
+            // Construct the JSON response containing the base64 image string
+            const jsonResponse = {
+                imageUrl: imageUrl,
+                imageData: base64Image
+            };
+            // Send the JSON response
+            res.json(jsonResponse);
+        }
+    });
+});
+
+app.listen(3000, () => {
+    console.log('Server is running on port 3000');
+});

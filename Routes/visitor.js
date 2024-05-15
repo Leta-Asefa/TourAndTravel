@@ -18,6 +18,7 @@ router.post('/add', async (req, res) => {
     const data = {
         firstName: body.firstName,
         lastName: body.lastName,
+        siteName: body.siteName,
         dateOfBirth: body.dateOfBirth,
         sex: body.sex,
         nationality: body.nationality,
@@ -26,7 +27,8 @@ router.post('/add', async (req, res) => {
         startingDate: body.startingDate,
         endingDate: body.endingDate,
         bookingStatus: body.bookingStatus,
-        emergencyContact: body.emergencyContact
+        emergencyContact: body.emergencyContact,
+        guidePhoneNumber: body.guidePhoneNumber
 
     }
 
@@ -52,6 +54,7 @@ router.post('/find', async (req, res) => {
 
             firstName: typeof body.firstName === 'undefined' ? /.*/ : body.firstName,
             lastName: typeof body.lastName === 'undefined' ? /.*/ : body.lastName,
+            siteName: typeof body.siteName === 'undefined' ? /.*/ : body.siteName,
             dateOfBirth: typeof body.dateOfBirth === 'undefined' ? /.*/ : body.dateOfBirth,
             sex: typeof body.sex === 'undefined' ? /.*/ : body.sex,
             nationality: typeof body.nationality === 'undefined' ? /.*/ : body.nationality,
@@ -60,7 +63,8 @@ router.post('/find', async (req, res) => {
             startingDate: typeof body.startingDate === 'undefined' ? /.*/ : body.startingDate,
             endingDate: typeof body.endingDate === 'undefined' ? /.*/ : body.endingDate,
             bookingStatus: typeof body.bookingStatus === 'undefined' ? { $exists: true } : body.bookingStatus,
-            emergencyContact: typeof body.emergencyContact === 'undefined' ? { $exists: true } : body.emergencyContact
+            emergencyContact: typeof body.emergencyContact === 'undefined' ? { $exists: true } : body.emergencyContact,
+            guidePhoneNumber: typeof body.guidePhoneNumber === 'undefined' ? /.*/ : body.guidePhoneNumber
         })
 
         return res.json(visitor)
@@ -74,34 +78,36 @@ router.post('/find', async (req, res) => {
 
 
 router.patch('/update/:phoneNumber', async (req, res) => {
+
     
-    const existingDocument = await Visitor.findOne({ phoneNumber: req.params.phoneNumber })
-    if (!existingDocument) {
-        return res.status(404).json({ "error": 'Document not found' })
+    try {
+       const existingDocument = await Visitor.findOne({ phoneNumber: req.params.phoneNumber })
+
+        Object.keys(req.body).forEach((key) => {
+            existingDocument[key] = req.body[key]
+        })
+
+        const updatedDocument = await existingDocument.save()
+
+        res.json(updatedDocument)
+    }
+    catch (err) {
+        res.json({"error":err})
     }
 
-
-    Object.keys(req.body).forEach((key) => {
-        existingDocument[key] = req.body[key]
     })
-
-    const updatedDocument = await existingDocument.save()
-
-    res.json(updatedDocument)
-
-})
 
 
 
 router.delete('/delete/:phoneNumber', async (req, res) => {
-    
-    const result = await Visitor.deleteOne({ phoneNumber: req.params.phoneNumber })
 
-    if (result.deletedCount === 0)
-        res.json({ "error": "Not Found" })
+    try {
+        const result = await Visitor.deleteOne({ phoneNumber: req.params.phoneNumber })
 
-    res.json(({ "result": "Deleted Successfully" }))
-
+        res.json(({ "result": "Deleted Successfully" }))
+    } catch (err) {
+        res.json({'error':err})
+    }
 
 
 })

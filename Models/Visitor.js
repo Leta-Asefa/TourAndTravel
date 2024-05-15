@@ -9,6 +9,10 @@ const VisitorSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    siteName: {
+        type: String,
+        required:true
+    },
     dateOfBirth: {
         type: String,
         required: true
@@ -62,6 +66,10 @@ const VisitorSchema = mongoose.Schema({
             type: String,
             required: true
         }
+    },
+    guidePhoneNumber: {
+        type: String,
+        required: true
     }
 })
 

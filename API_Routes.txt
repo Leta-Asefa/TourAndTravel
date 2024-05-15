@@ -19,11 +19,26 @@ localhost:4000/guide/update/ {phoneNumber}
 localhost:4000/guide/delete/ {phoneNumber}
 
 ----------------------------------BOOKS' ENDPOINTS-------------------------------------------------
-localhost:4000/book
+localhost:4000/book/all
+localhost:4000/book/add
+localhost:4000/book/find
+localhost:4000/book/update/ {id}
+localhost:4000/book/delete/ {id}
 
 ----------------------------------ADMIN'S ENDPOINTS-------------------------------------------------
-localhost:4000/admin
-
+localhost:4000/site/all
+localhost:4000/site/add
+localhost:4000/site/find
+localhost:4000/site/update/ {siteName}
+localhost:4000/site/delete/ {siteName}
+localhost:4000/visitor/all
+localhost:4000/visitor/find
+localhost:4000/guide/all
+localhost:4000/guide/add
+localhost:4000/guide/find
+localhost:4000/guide/update/ {phoneNumber}
+localhost:4000/book/all
+localhost:4000/book/find
 
 
 
@@ -56,6 +71,8 @@ request(options, function (error, response) {
   if (error) throw new Error(error);
   console.log(response.body);
 });
+
+------------------------------------------Multer-----------------------------
 
 
 
