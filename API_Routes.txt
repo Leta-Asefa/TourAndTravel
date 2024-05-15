@@ -1,44 +1,53 @@
 ----------------------------------SITE'S ENDPOINTS---------------------------------------------
-localhost:4000/site/all
-localhost:4000/site/add
-localhost:4000/site/find
-localhost:4000/site/update/ {siteName}
-localhost:4000/site/delete/ {siteName}
+GET    : localhost:4000/site/all
+POST   : localhost:4000/site/add
+POST   : localhost:4000/site/find
+PATCH  : localhost:4000/site/update/ {siteName}
+DELETE : localhost:4000/site/delete/ {siteName}
+POST   : localhost:4000/site/addImages/ {siteName}
+GET    : localhost:4000/site/getImages/ {siteName}
+POST   : localhost:4000/site/addVideos/ {siteName}
+GET    : localhost:4000/site/getVideos/ {siteName}
+
 ----------------------------------VISITORS'S ENDPOINTS---------------------------------------------
-localhost:4000/visitor/all
-localhost:4000/visitor/add
-localhost:4000/visitor/find
-localhost:4000/visitor/update/ {phoneNumber}
-localhost:4000/visitor/delete/ {phoneNumber}
+GET    : localhost:4000/visitor/all
+POST   : localhost:4000/visitor/add
+POST   : localhost:4000/visitor/find
+PATCH  : localhost:4000/visitor/update/ {phoneNumber}
+DELETE : localhost:4000/visitor/delete/ {phoneNumber}
 
 ----------------------------------TOURGUIDE'S ENDPOINTS---------------------------------------------
-localhost:4000/guide/all
-localhost:4000/guide/add
-localhost:4000/guide/find
-localhost:4000/guide/update/ {phoneNumber}
-localhost:4000/guide/delete/ {phoneNumber}
+GET    : host:4000/guide/all
+POST   : host:4000/guide/add
+POST   : host:4000/guide/find
+PATCH  : host:4000/guide/update/ {phoneNumber}
+DELETE : host:4000/guide/delete/ {phoneNumber}
 
 ----------------------------------BOOKS' ENDPOINTS-------------------------------------------------
-localhost:4000/book/all
-localhost:4000/book/add
-localhost:4000/book/find
-localhost:4000/book/update/ {id}
-localhost:4000/book/delete/ {id}
+GET    : host:4000/book/all
+P0ST   : host:4000/book/add
+POST   : host:4000/book/find
+PATCH  : host:4000/book/update/ {id}
+DELETE  : host:4000/book/delete/ {id}
 
 ----------------------------------ADMIN'S ENDPOINTS-------------------------------------------------
-localhost:4000/site/all
-localhost:4000/site/add
-localhost:4000/site/find
-localhost:4000/site/update/ {siteName}
-localhost:4000/site/delete/ {siteName}
-localhost:4000/visitor/all
-localhost:4000/visitor/find
-localhost:4000/guide/all
-localhost:4000/guide/add
-localhost:4000/guide/find
-localhost:4000/guide/update/ {phoneNumber}
-localhost:4000/book/all
-localhost:4000/book/find
+GET    : localhost:4000/site/all
+POST   : localhost:4000/site/add
+POST   : localhost:4000/site/find
+PATCH  : localhost:4000/site/update/ {siteName}
+DELETE : localhost:4000/site/delete/ {siteName}
+POST   : localhost:4000/site/addImages/ {siteName}
+GET    : localhost:4000/site/getImages/ {siteName}
+POST   : localhost:4000/site/addVideos/ {siteName}
+GET    : localhost:4000/site/getVideos/ {siteName}
+GET    : localhost:4000/visitor/all
+POST   : localhost:4000/visitor/add
+GET    : host:4000/guide/all
+POST   : host:4000/guide/add
+POST   : host:4000/guide/find
+PATCH  : host:4000/guide/update/ {phoneNumber}
+GET    : host:4000/book/all
+POST   : host:4000/book/find
 
 
 
