@@ -1,6 +1,23 @@
 const express = require('express')
 const TourGuide = require('../Models/TourGuide')
+const multer = require('multer');
+const fs = require('fs')
+const path = require('path');
+
 const router = express.Router()
+
+
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'Images')
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname))
+    }
+})
+const upload = multer({ storage: storage })
+
 
 router.get('/all', async (req, res) => {
     try {
@@ -11,7 +28,6 @@ router.get('/all', async (req, res) => {
         res.json({ 'error': err })
     }
 })
-
 
 
 router.post('/add', async (req, res) => {
@@ -28,7 +44,7 @@ router.post('/add', async (req, res) => {
         education: body.education,
         rating: body.rating,
         profilePicture: body.profilePicture,
-        salary:body.salary
+        salary: body.salary
 
     }
 
@@ -77,10 +93,10 @@ router.post('/find', async (req, res) => {
 
 
 router.patch('/update/:phoneNumber', async (req, res) => {
-    
+
     try {
         const existingDocument = await TourGuide.findOne({ phoneNumber: req.params.phoneNumber })
-    
+
         Object.keys(req.body).forEach((key) => {
             existingDocument[key] = req.body[key]
         })
@@ -89,24 +105,59 @@ router.patch('/update/:phoneNumber', async (req, res) => {
 
         res.json(updatedDocument)
     } catch (err) {
-        res.json({"error":err})
+        res.json({ "error": err })
+    }
+
+})
+
+router.patch('/addProfilePic/:phoneNumber', upload.single('image'), async (req, res) => {
+
+    console.log(req.file)
+
+    try {
+        imagepath = `Images/${req.file.filename}`
+        const guide = await TourGuide.findOne({ phoneNumber: req.params.phoneNumber })
+        guide["profilePicture"] = imagepath
+        const updatedGuide = await guide.save()
+        res.json(updatedGuide)
+    } catch (err) {
+        console.log(err)
+        res.json({ error: err })
     }
 
 })
 
 
+
+router.get('/getProfilePic/:phoneNumber', async (req, res) => {
+    const guide = await TourGuide.findOne({ phoneNumber: req.params.phoneNumber }).select("profilePicture")
+    try {
+
+        const filePath = path.join(__dirname, '../', guide.profilePicture);
+        const image = fs.readFileSync(filePath);
+        const base64Image = Buffer.from(image).toString('base64');
+        res.json({ profilePicture: base64Image });
+
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+})
+
 router.delete('/delete/:phoneNumber', async (req, res) => {
-    
+
     try {
         const result = await TourGuide.deleteOne({ phoneNumber: req.params.phoneNumber })
 
         res.json(({ "result": "Deleted Successfully" }))
     } catch (err) {
-        res.json({'error':err})
+        res.json({ 'error': err })
     }
 
 
 })
 
 
-module.exports=router
+
+
+module.exports = router

@@ -11,7 +11,8 @@ connection.on('open', () => console.log('Database Connection Established...'))
 app.listen(PORT, () => console.log('Server started on port ' + PORT))
 app.use(express.json())
 
-
+const authRouter = require('./Routes/auth.js')
+app.use('/auth', authRouter)
 
 
 const siteRouter = require('./Routes/site.js')
