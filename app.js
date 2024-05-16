@@ -1,5 +1,6 @@
 const express = require('express')
 const mongoose = require('mongoose')
+const cookieParser=require('cookie-parser')
 const app = express()
 const DBURL = 'mongodb://localhost:27017/TourAndTravelAgency'
 const PORT = 4000
@@ -10,6 +11,7 @@ connection.on('open', () => console.log('Database Connection Established...'))
 
 app.listen(PORT, () => console.log('Server started on port ' + PORT))
 app.use(express.json())
+app.use(cookieParser())
 
 const authRouter = require('./Routes/auth.js')
 app.use('/auth', authRouter)
