@@ -3,6 +3,7 @@ const TourGuide = require('../Models/TourGuide')
 const multer = require('multer');
 const fs = require('fs')
 const path = require('path');
+const {requireAuth}=require('../Middleware/AuthMiddleware')
 
 const router = express.Router()
 
@@ -30,7 +31,7 @@ router.get('/all', async (req, res) => {
 })
 
 
-router.post('/add', async (req, res) => {
+router.post('/add',requireAuth, async (req, res) => {
     const body = req.body
     const data = {
         firstName: body.firstName,
@@ -92,7 +93,7 @@ router.post('/find', async (req, res) => {
 })
 
 
-router.patch('/update/:phoneNumber', async (req, res) => {
+router.patch('/update/:phoneNumber',requireAuth, async (req, res) => {
 
     try {
         const existingDocument = await TourGuide.findOne({ phoneNumber: req.params.phoneNumber })
@@ -110,7 +111,7 @@ router.patch('/update/:phoneNumber', async (req, res) => {
 
 })
 
-router.patch('/addProfilePic/:phoneNumber', upload.single('image'), async (req, res) => {
+router.patch('/addProfilePic/:phoneNumber',requireAuth, upload.single('image'), async (req, res) => {
 
     console.log(req.file)
 
@@ -144,7 +145,7 @@ router.get('/getProfilePic/:phoneNumber', async (req, res) => {
     }
 })
 
-router.delete('/delete/:phoneNumber', async (req, res) => {
+router.delete('/delete/:phoneNumber',requireAuth, async (req, res) => {
 
     try {
         const result = await TourGuide.deleteOne({ phoneNumber: req.params.phoneNumber })

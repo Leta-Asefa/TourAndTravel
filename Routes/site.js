@@ -3,6 +3,7 @@ const Site = require('../Models/Site')
 const multer = require('multer');
 const fs=require('fs')
 const path = require('path');
+const {requireAuth}=require("../Middleware/AuthMiddleware")
 
 const router = express.Router()
 
@@ -30,7 +31,7 @@ router.get('/all', async (req, res) => {
 })
 
 
-router.post('/add', async (req, res) => {
+router.post('/add',requireAuth, async (req, res) => {
     
             const data = {
                 siteName: req.body.siteName,
@@ -89,7 +90,7 @@ router.post('/find', async (req, res) => {
 
 })
 
-router.patch('/update/:siteName', async (req, res) => {
+router.patch('/update/:siteName',requireAuth, async (req, res) => {
     
     try {
         const existingDocument = await Site.findOne({ siteName: req.params.siteName })
@@ -107,7 +108,7 @@ router.patch('/update/:siteName', async (req, res) => {
 
 })
 
-router.patch('/addImages/:siteName', (req, res) => {
+router.patch('/addImages/:siteName',requireAuth, (req, res) => {
 
     upload(req, res, async (err) => {
         if (err) {
@@ -154,7 +155,7 @@ router.get('/getImages/:siteName', async(req, res) => {
     }
 })
 
-router.patch('/addVideos/:siteName', (req, res) => {
+router.patch('/addVideos/:siteName',requireAuth, (req, res) => {
 
 
     upload(req, res, async (err) => {
@@ -202,7 +203,7 @@ router.get('/getVideos/:siteName', async(req, res) => {
 })
 
 
-router.delete('/delete/:siteName', async (req, res) => {
+router.delete('/delete/:siteName',requireAuth, async (req, res) => {
     try {
         const result = await Site.deleteOne({ siteName: req.params.siteName })
 

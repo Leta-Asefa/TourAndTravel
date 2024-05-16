@@ -1,8 +1,9 @@
 const express = require('express')
 const Book = require('../Models/Book')
+const {requireAuth}=require('../Middleware/AuthMiddleware')
 const router = express.Router()
 
-router.get('/all', async (req, res) => {
+router.get('/all',requireAuth, async (req, res) => {
     try {
         const books = await Book.find()
         res.json(books)
@@ -13,7 +14,7 @@ router.get('/all', async (req, res) => {
 })
 
 
-router.post('/add', async (req, res) => {
+router.post('/add',requireAuth, async (req, res) => {
     const body = req.body
     const data = {
         visitors: body.visitors,
@@ -38,7 +39,7 @@ router.post('/add', async (req, res) => {
 )
 
 
-router.post('/find', async (req, res) => {
+router.post('/find',requireAuth, async (req, res) => {
     const body = req.body
 
     try {
@@ -61,7 +62,7 @@ router.post('/find', async (req, res) => {
 
 })
 
-router.patch('/update/:id', async (req, res) => {
+router.patch('/update/:id',requireAuth, async (req, res) => {
 
     try {
        const existingDocument = await Book.findById(req.params.id)
@@ -83,7 +84,7 @@ router.patch('/update/:id', async (req, res) => {
 })
 
 
-router.delete('/delete/:id', async (req, res) => {
+router.delete('/delete/:id',requireAuth, async (req, res) => {
 
    
     try {

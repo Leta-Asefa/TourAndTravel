@@ -1,8 +1,9 @@
 const express = require('express')
 const Visitor = require('../Models/Visitor')
 const router = express.Router()
+const {requireAuth}=require('../Middleware/AuthMiddleware')
 
-router.get('/all', async (req, res) => {
+router.get('/all',requireAuth, async (req, res) => {
     try {
         const visitors = await Visitor.find()
         res.json(visitors)
@@ -13,7 +14,7 @@ router.get('/all', async (req, res) => {
 })
 
 
-router.post('/add', async (req, res) => {
+router.post('/add',requireAuth, async (req, res) => {
     const body = req.body
     const data = {
         firstName: body.firstName,
@@ -45,7 +46,7 @@ router.post('/add', async (req, res) => {
 }
 )
 
-router.post('/find', async (req, res) => {
+router.post('/find',requireAuth, async (req, res) => {
     const body = req.body
 
     try {
@@ -77,7 +78,7 @@ router.post('/find', async (req, res) => {
 })
 
 
-router.patch('/update/:phoneNumber', async (req, res) => {
+router.patch('/update/:phoneNumber',requireAuth, async (req, res) => {
 
     
     try {
@@ -99,7 +100,7 @@ router.patch('/update/:phoneNumber', async (req, res) => {
 
 
 
-router.delete('/delete/:phoneNumber', async (req, res) => {
+router.delete('/delete/:phoneNumber',requireAuth, async (req, res) => {
 
     try {
         const result = await Visitor.deleteOne({ phoneNumber: req.params.phoneNumber })
