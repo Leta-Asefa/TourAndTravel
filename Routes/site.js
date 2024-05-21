@@ -19,8 +19,6 @@ const upload=multer({storage:storage}).array('images', 10)
 
 
 router.get('/all', async (req, res) => {
-
-    console.log("redirected")
     try {
         const sites = await Site.find()
         res.json(sites)
@@ -31,9 +29,8 @@ router.get('/all', async (req, res) => {
 })
 
 
-router.post('/add',requireAuth, async (req, res) => {
-    
-            const data = {
+router.post('/add', requireAuth, async (req, res) => {
+          const data = {
                 siteName: req.body.siteName,
                 description: req.body.description,
                 location: req.body.location,
@@ -42,7 +39,6 @@ router.post('/add',requireAuth, async (req, res) => {
                 categories: req.body.categories,
                 facilitiesAvailable: req.body.facilitiesAvailable,
                 rating: req.body.rating,
-                videos: req.body.videos,
                 transportations: req.body.transportations
         
             }
@@ -52,7 +48,6 @@ router.post('/add',requireAuth, async (req, res) => {
             try {
                 const result = await site.save()
                 res.json(result)
-        
             } catch (err) {
                 res.json({ "error": err })
             }
@@ -109,16 +104,15 @@ router.patch('/update/:siteName',requireAuth, async (req, res) => {
 })
 
 router.patch('/addImages/:siteName',requireAuth, (req, res) => {
-
+    console.log('entered')
     upload(req, res, async (err) => {
         if (err) {
             console.error(err);
             res.status(500).json({ error: 'Failed to upload images' });
         } else {
-            //ensure there in no duplicated images, appending on the existing images, deleteing images ....
-
             try {
                 imagepaths = req.files.map(file => `Images/${file.filename}`);
+                console.log(imagepaths)
                 const site = await Site.findOne({ siteName: req.params.siteName })
                 site["images"].push(...imagepaths)
                 const updatedSite = await site.save()
@@ -135,7 +129,9 @@ router.patch('/addImages/:siteName',requireAuth, (req, res) => {
 )
 
 router.get('/getImages/:siteName', async(req, res) => {
-    const {images:imagepaths} = await Site.findOne({ siteName: req.params.siteName }).select("images")
+    
+
+    const { images: imagepaths } = await Site.findOne({ siteName: req.params.siteName }).select("images")
     try {
         
         const images = [];
@@ -155,9 +151,8 @@ router.get('/getImages/:siteName', async(req, res) => {
     }
 })
 
-router.patch('/addVideos/:siteName',requireAuth, (req, res) => {
-
-
+router.patch('/addVideos/:siteName', (req, res) => {
+   
     upload(req, res, async (err) => {
         if (err) {
             console.error(err);

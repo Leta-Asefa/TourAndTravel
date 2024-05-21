@@ -1,5 +1,6 @@
 const express = require('express')
 const mongoose = require('mongoose')
+const cors=require('cors')
 const cookieParser=require('cookie-parser')
 const app = express()
 const DBURL = 'mongodb://localhost:27017/TourAndTravelAgency'
@@ -10,8 +11,15 @@ const connection = mongoose.connection
 connection.on('open', () => console.log('Database Connection Established...'))
 
 app.listen(PORT, () => console.log('Server started on port ' + PORT))
+
 app.use(express.json())
 app.use(cookieParser())
+const frontendOrigin = 'http://localhost:3000';
+
+app.use(cors({
+  origin: frontendOrigin,
+  credentials: true // Allow credentials (cookies) to be sent
+}));
 
 const authRouter = require('./Routes/auth.js')
 app.use('/auth', authRouter)
