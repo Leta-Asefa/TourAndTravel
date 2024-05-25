@@ -35,7 +35,7 @@ router.get('/all', async (req, res) => {
 router.get('/getIntro', async (req, res) => {
    
     try {
-        const guides = await TourGuide.find().select('firstName lastName rating profilePicture experience education phoneNumber')
+        const guides = await TourGuide.find({status:'approved'}).select('firstName lastName rating profilePicture experience education phoneNumber')
        
         for (const guide of guides) {
             if (guide.profilePicture) {
@@ -115,7 +115,7 @@ router.get('/get/:phoneNumber', async (req, res) => {
 
 
 
-router.post('/add', requireAuth, async (req, res) => {
+router.post('/add', async (req, res) => {
     const body = req.body
     const data = {
         firstName: body.firstName,

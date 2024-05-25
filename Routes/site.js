@@ -246,6 +246,56 @@ router.get('/getIntro', async (req, res) => {
 })
 
 
+router.post('/filter', async (req, res) => {
+    const { siteName, address, category, openingHours, rating, distance } = req.body;
+    console.log(req.body);
+
+    try {
+        // Build the query object dynamically
+        let query = {};
+
+        if (siteName) {
+            query.siteName = { $regex: `^${siteName}`, $options: 'i' };
+        }
+
+        if (address) {
+            query['location.address'] = { $regex: `^${address}`, $options: 'i' };
+        }
+
+        if (category) {
+            query.categories = category;
+        }
+
+        if (openingHours) {
+            query.openingHours = openingHours;
+        }
+
+        if (rating) {
+            query.rating = { $gte: rating };
+        }
+
+        if (distance) {
+            query.distance = distance;
+        }
+
+
+        const sites = await Site.find(query);
+        for (const site of sites) {
+            if (site.images.length > 0) {
+                const firstImage = site.images[0];
+                const base64Image = await fetchBase64Image(firstImage); // Fetch base64 data for the first image
+                site.images = base64Image; 
+            }
+        }
+        res.json(sites);
+        
+    } catch (error) {
+        console.error('Error fetching sites:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+
 
 
 
