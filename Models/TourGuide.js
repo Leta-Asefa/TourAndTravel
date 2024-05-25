@@ -51,9 +51,13 @@ const TourGuideSchema = mongoose.Schema({
     profilePicture: {
         type: String
     },
-    salary: {
+    hourlyRate: {
         type: Number,
         required: true
+    },
+    documents: [{ type: String }],
+    status: {
+        type:String
     }
 })
 

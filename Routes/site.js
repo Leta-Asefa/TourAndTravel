@@ -28,6 +28,20 @@ router.get('/all', async (req, res) => {
     }
 })
 
+router.get('/get/:siteName', async (req, res) => {
+    console.log('entered')
+    try {
+        const site = await Site.findOne({ siteName: req.params.siteName })
+        site.images =await fetchBase64Images(site.images)
+        site.videos = await fetchBase64Images(site.videos)
+        console.log("Images ",site)
+        res.json(site)
+
+    } catch (err) {
+        console.log(err)
+        res.send(err)
+    }
+})
 
 router.post('/add', requireAuth, async (req, res) => {
           const data = {
@@ -104,7 +118,6 @@ router.patch('/update/:siteName',requireAuth, async (req, res) => {
 })
 
 router.patch('/addImages/:siteName',requireAuth, (req, res) => {
-    console.log('entered')
     upload(req, res, async (err) => {
         if (err) {
             console.error(err);
@@ -142,7 +155,7 @@ router.get('/getImages/:siteName', async(req, res) => {
             const base64Image = Buffer.from(image).toString('base64');
             images.push(base64Image);
         }
-
+        console.log("Images  -   " ,images)
         res.json({ images: images });
         
     } catch (error) {
@@ -210,7 +223,67 @@ router.delete('/delete/:siteName',requireAuth, async (req, res) => {
 
 })
 
+router.get('/getIntro', async (req, res) => {
 
+    try {
+        const sites = await Site.find().select('siteName description rating images categories')
+
+        for (const site of sites) {
+            if (site.images.length > 0) {
+                const firstImage = site.images[0];
+                const base64Image = await fetchBase64Image(firstImage); // Fetch base64 data for the first image
+                site.images = base64Image; 
+            }
+        }
+
+        res.json(sites)
+
+    } catch (err) {
+        console.log(err)
+        res.send(err)
+    }
+
+})
+
+
+
+
+
+async function fetchBase64Image(imagePath) {
+    return new Promise((resolve, reject) => {
+        fs.readFile(imagePath, (err, data) => {
+            if (err) {
+                reject(err); // If there's an error, reject the promise
+            } else {
+                // Convert the image data to base64 format
+                const base64Image = Buffer.from(data).toString('base64');
+                resolve(base64Image); // Resolve with the base64 image data
+            }
+        });
+    });
+}
+
+
+async function fetchBase64Images(imagePaths) {
+    try {
+        if (!Array.isArray(imagePaths)) {
+            throw new Error('imagePaths must be an array');
+        }
+
+        // Map over the array of image paths and fetch each image asynchronously
+        const base64Images = [];
+        for (const imagePath of imagePaths) {
+            console.log(imagePath)
+            const data =await  fs.promises.readFile(imagePath);
+            const base64Image = Buffer.from(data).toString('base64');
+            base64Images.push(base64Image);
+        }
+
+        return base64Images; // Return the array of base64 images
+    } catch (error) {
+        throw error; // Throw any errors that occurred during the process
+    }
+}
 
 
 
